@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "423493991129",
+    "project_id": "minimalnotesfirebase",
+    "storage_bucket": "minimalnotesfirebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423493991129:android:42e240339afb8d4266dcc8",
+        "android_client_info": {
+          "package_name": "com.example.minimalnotes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXQLqgboxmuLSBWK8kbT6US-gXRrnoIOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

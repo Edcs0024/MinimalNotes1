@@ -46,6 +46,7 @@ fun HomeScreen(
     viewModel: NotesViewModel
 ) {
     val notes by viewModel.notes.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
@@ -82,6 +83,15 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            if (errorMessage.isNotBlank()) {
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             Text(
                 text = "Nueva nota",

@@ -1,7 +1,7 @@
 package com.example.minimalnotes.data
 
 data class Note(
-    val id: Long = System.currentTimeMillis(),
+    val id: String = "",
     val title: String = "",
     val content: String = "",
     val category: String = "General",

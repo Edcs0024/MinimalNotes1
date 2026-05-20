@@ -1,64 +1,73 @@
 package com.example.minimalnotes.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.ViewModel
+import com.example.minimalnotes.data.FirebaseNoteRepository
 import com.example.minimalnotes.data.Note
-import com.example.minimalnotes.data.NoteDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
-class NotesViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+class NotesViewModel : ViewModel() {
 
-    private val noteDataStore = NoteDataStore(application)
+    private val repository = FirebaseNoteRepository()
 
     private val _notes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = _notes
 
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage: StateFlow<String> = _errorMessage
+
     init {
-        viewModelScope.launch {
-            noteDataStore.notesFlow.collect { savedNotes ->
-                _notes.value = savedNotes
+        loadNotes()
+    }
+
+    private fun loadNotes() {
+        repository.listenNotes(
+            onSuccess = { notesList ->
+                _notes.value = notesList
+            },
+            onError = { exception ->
+                _errorMessage.value = exception.message ?: "Error al cargar notas"
             }
-        }
+        )
     }
 
     fun addNote(title: String, content: String, category: String) {
         if (title.isBlank() && content.isBlank()) return
 
-        val newNote = Note(
+        repository.addNote(
             title = title,
             content = content,
-            category = if (category.isBlank()) "General" else category
+            category = category,
+            onSuccess = {
+                _errorMessage.value = ""
+            },
+            onError = { exception ->
+                _errorMessage.value = exception.message ?: "Error al guardar nota"
+            }
         )
-
-        val updatedNotes = _notes.value + newNote
-        saveNotes(updatedNotes)
     }
 
     fun deleteNote(note: Note) {
-        val updatedNotes = _notes.value.filter { it.id != note.id }
-        saveNotes(updatedNotes)
+        repository.deleteNote(
+            noteId = note.id,
+            onSuccess = {
+                _errorMessage.value = ""
+            },
+            onError = { exception ->
+                _errorMessage.value = exception.message ?: "Error al eliminar nota"
+            }
+        )
     }
 
     fun toggleFavorite(note: Note) {
-        val updatedNotes = _notes.value.map {
-            if (it.id == note.id) {
-                it.copy(isFavorite = !it.isFavorite)
-            } else {
-                it
+        repository.toggleFavorite(
+            note = note,
+            onSuccess = {
+                _errorMessage.value = ""
+            },
+            onError = { exception ->
+                _errorMessage.value = exception.message ?: "Error al actualizar favorito"
             }
-        }
-
-        saveNotes(updatedNotes)
-    }
-
-    private fun saveNotes(notes: List<Note>) {
-        viewModelScope.launch {
-            noteDataStore.saveNotes(notes)
-        }
+        )
     }
 }
